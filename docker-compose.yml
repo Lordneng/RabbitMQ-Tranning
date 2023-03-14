@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  rabbitmq.api:
+    image: ${DOCKER_REGISTRY-}rabbitmqapi
+    build:
+      context: .
+      dockerfile: RabbitMQ.API/Dockerfile
+    depends_on:
+      - rabbitmq
+    networks:
+      - rabbitmq
+
+  rabbitmq.direct.api:
+    image: ${DOCKER_REGISTRY-}rabbitmqdirectapi
+    build:
+      context: .
+      dockerfile: RabbitMQ.DIRECT.API/Dockerfile
+    depends_on:
+      - rabbitmq
+    networks:
+      - rabbitmq
+
+  rabbitmq:
+    image: 'rabbitmq:3.6-management-alpine'
+    ports:
+      # The standard AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+    environment:
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "P@ssw0rd!"
+    networks:
+      - rabbitmq
+
+networks:
+  rabbitmq:
